@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Voyage du Héros — Timeline du Monomythe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4a574;
+            --gold-light: #e8c9a0;
+            --gold-dark: #a67c52;
+            --ink: #1a1612;
+            --ink-light: #2a2520;
+            --parchment: #f5f0e6;
+            --parchment-dark: #e8dcc8;
+            --blood: #8b2635;
+            --sea: #2d4a5e;
+            --forest: #3d5c47;
+            
+            --phase-departure: #4a6fa5;
+            --phase-initiation: #8b4a5e;
+            --phase-return: #5c7a4a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Pro', Georgia, serif;
+            background: var(--ink);
+            color: var(--parchment);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Noise texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 2rem 2rem 1.5rem;
+            background: linear-gradient(180deg, rgba(212, 165, 116, 0.08), transparent);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 600;
+            color: var(--gold);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--parchment-dark);
+            opacity: 0.8;
+        }
+
+        /* Epic selector */
+        .epic-selector {
+            display: flex;
+            justify-content: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            padding: 1rem 1rem 0;
+        }
+
+        .epic-btn {
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            padding: 0.5rem 0.8rem;
+            background: transparent;
+            border: 1px solid rgba(212, 165, 116, 0.25);
+            color: var(--parchment-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .epic-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .epic-btn.active {
+            background: var(--gold);
+            color: var(--ink);
+            border-color: var(--gold);
+        }
+
+        .epic-btn .emoji {
+            font-size: 1.1rem;
+            font-family: system-ui;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            position: sticky;
+            top: 120px;
+            z-index: 99;
+            padding: 0.5rem 2rem;
+            background: rgba(26, 22, 18, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(212, 165, 116, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--phase-departure), var(--phase-initiation), var(--phase-return));
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.3rem;
+            font-family: 'Cinzel', serif;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .progress-label {
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .progress-label.active {
+            opacity: 1;
+            color: var(--gold);
+        }
+
+        /* Timeline container */
+        .timeline-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem 5rem;
+            position: relative;
+        }
+
+        /* Central line */
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(
+                180deg,
+                transparent 0%,
+                var(--phase-departure) 5%,
+                var(--phase-departure) 35%,
+                var(--phase-initiation) 40%,
+                var(--phase-initiation) 65%,
+                var(--phase-return) 70%,
+                var(--phase-return) 95%,
+                transparent 100%
+            );
+            transform: translateX(-50%);
+        }
+
+        @media (max-width: 768px) {
+            .timeline-line {
+                left: 20px;
+            }
+        }
+
+        /* Phase markers */
+        .phase-marker {
+            position: relative;
+            text-align: center;
+            padding: 2rem 0;
+            margin: 2rem 0;
+        }
+
+        .phase-marker::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid;
+            background: var(--ink);
+            z-index: 1;
+        }
+
+        .phase-marker.departure::before { border-color: var(--phase-departure); }
+        .phase-marker.initiation::before { border-color: var(--phase-initiation); }
+        .phase-marker.return::before { border-color: var(--phase-return); }
+
+        .phase-marker .phase-icon {
+            position: relative;
+            z-index: 2;
+            font-size: 1.8rem;
+            line-height: 60px;
+        }
+
+        .phase-marker .phase-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+
+        .phase-marker.departure .phase-title { color: var(--phase-departure); }
+        .phase-marker.initiation .phase-title { color: var(--phase-initiation); }
+        .phase-marker.return .phase-title { color: var(--phase-return); }
+
+        .phase-marker .phase-subtitle {
+            font-style: italic;
+            color: var(--parchment-dark);
+            opacity: 0.7;
+            margin-top: 0.3rem;
+        }
+
+        @media (max-width: 768px) {
+            .phase-marker {
+                text-align: left;
+                padding-left: 60px;
+            }
+            .phase-marker::before {
+                left: 20px;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        /* Timeline items */
+        .timeline-item {
+            position: relative;
+            padding: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-item .content {
+            width: calc(50% - 40px);
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(26, 22, 18, 0.95), rgba(42, 37, 32, 0.9));
+            border: 1px solid rgba(212, 165, 116, 0.15);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) .content {
+            margin-right: auto;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) .content {
+            margin-left: auto;
+            text-align: left;
+        }
+
+        .timeline-item .content:hover {
+            border-color: rgba(212, 165, 116, 0.4);
+            transform: scale(1.02);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-item .content.expanded {
+            width: calc(100% - 80px);
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        /* Node on timeline */
+        .timeline-node {
+            position: absolute;
+            left: 50%;
+            top: 2rem;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--ink);
+            border: 3px solid var(--gold-dark);
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-node,
+        .timeline-item .content.expanded ~ .timeline-node {
+            background: var(--gold);
+            border-color: var(--gold-light);
+            box-shadow: 0 0 20px rgba(212, 165, 116, 0.5);
+        }
+
+        .timeline-item.departure .timeline-node { border-color: var(--phase-departure); }
+        .timeline-item.initiation .timeline-node { border-color: var(--phase-initiation); }
+        .timeline-item.return .timeline-node { border-color: var(--phase-return); }
+
+        @media (max-width: 768px) {
+            .timeline-item {
+                flex-direction: row !important;
+            }
+            .timeline-item .content {
+                width: calc(100% - 50px) !important;
+                margin-left: auto !important;
+                margin-right: 0 !important;
+                text-align: left !important;
+            }
+            .timeline-node {
+                left: 20px;
+            }
+        }
+
+        /* Step content */
+        .step-number {
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.5;
+            margin-bottom: 0.3rem;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-item:nth-child(odd) .step-header {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-item:nth-child(odd) .content.expanded .step-header {
+            flex-direction: row;
+        }
+
+        @media (max-width: 768px) {
+            .timeline-item:nth-child(odd) .step-header {
+                flex-direction: row;
+            }
+        }
+
+        .step-icon {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .step-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--gold);
+        }
+
+        .step-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--parchment-dark);
+        }
+
+        /* Epic examples */
+        .epic-examples {
+            display: none;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(212, 165, 116, 0.2);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .epic-examples.visible {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .epic-example {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.25);
+            margin-bottom: 0.8rem;
+            border-left: 3px solid var(--sea);
+            transition: all 0.3s ease;
+        }
+
+        .epic-example:last-child {
+            margin-bottom: 0;
+        }
+
+        .epic-example:hover {
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .epic-example.odyssey { border-left-color: #4a90a4; }
+        .epic-example.starwars { border-left-color: #ffd700; }
+        .epic-example.lotr { border-left-color: #6b8e5a; }
+        .epic-example.matrix { border-left-color: #00ff41; }
+        .epic-example.zelda { border-left-color: #7cba3d; }
+        .epic-example.harrypotter { border-left-color: #946b2d; }
+        .epic-example.lionking { border-left-color: #e67e22; }
+
+        .epic-example .icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .epic-example .title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: var(--gold-light);
+            margin-bottom: 0.3rem;
+        }
+
+        .epic-example .text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--parchment);
+        }
+
+        /* Click hint */
+        .click-hint {
+            font-size: 0.75rem;
+            color: var(--gold-dark);
+            font-style: italic;
+            margin-top: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .content.expanded .click-hint {
+            display: none;
+        }
+
+        /* Intro section */
+        .intro-section {
+            text-align: center;
+            padding: 2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .intro-quote {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--parchment);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .intro-author {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            color: var(--gold);
+            letter-spacing: 0.1em;
+        }
+
+        .intro-text {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--parchment-dark);
+        }
+
+        /* End section */
+        .end-section {
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-top: 2rem;
+        }
+
+        .end-section .end-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .end-section .end-quote {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--parchment);
+            max-width: 600px;
+            margin: 0 auto 1rem;
+            line-height: 1.8;
+        }
+
+        .end-section .end-author {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            color: var(--gold);
+            letter-spacing: 0.1em;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(212, 165, 116, 0.1);
+            color: var(--parchment-dark);
+            font-size: 0.85rem;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+            font-size: 0.75rem;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.05em;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.departure { background: var(--phase-departure); }
+        .legend-dot.initiation { background: var(--phase-initiation); }
+        .legend-dot.return { background: var(--phase-return); }
+
+        /* Navigation hint */
+        .nav-hint {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            color: var(--gold);
+            opacity: 0.5;
+            letter-spacing: 0.1em;
+            animation: bounce 2s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Le Voyage du Héros</h1>
+        <p class="subtitle">Timeline du Monomythe</p>
+        
+        <nav class="epic-selector">
+            <button class="epic-btn active" data-epic="all">
+                <span class="emoji">🌟</span>
+                Toutes
+            </button>
+            <button class="epic-btn" data-epic="odyssey">
+                <span class="emoji">🏛️</span>
+                L'Odyssée
+            </button>
+            <button class="epic-btn" data-epic="starwars">
+                <span class="emoji">⚔️</span>
+                Star Wars
+            </button>
+            <button class="epic-btn" data-epic="lotr">
+                <span class="emoji">💍</span>
+                Seigneur des Anneaux
+            </button>
+            <button class="epic-btn" data-epic="matrix">
+                <span class="emoji">💊</span>
+                Matrix
+            </button>
+            <button class="epic-btn" data-epic="zelda">
+                <span class="emoji">🗡️</span>
+                Zelda BOTW
+            </button>
+            <button class="epic-btn" data-epic="harrypotter">
+                <span class="emoji">⚡</span>
+                Harry Potter
+            </button>
+            <button class="epic-btn" data-epic="lionking">
+                <span class="emoji">🦁</span>
+                Le Roi Lion
+            </button>
+        </nav>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="progress-labels">
+            <span class="progress-label active" data-phase="departure">I. Départ</span>
+            <span class="progress-label" data-phase="initiation">II. Initiation</span>
+            <span class="progress-label" data-phase="return">III. Retour</span>
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <span class="legend-dot departure"></span>
+            <span>Départ</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot initiation"></span>
+            <span>Initiation</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot return"></span>
+            <span>Retour</span>
+        </div>
+    </div>
+
+    <main class="timeline-container">
+        <div class="timeline-line"></div>
+
+        <section class="intro-section">
+            <p class="intro-quote">« Le héros aux mille et un visages n'est qu'un seul héros : c'est nous-mêmes, en quête de transformation. »</p>
+            <p class="intro-author">— Joseph Campbell</p>
+            <p class="intro-text">En 1949, Joseph Campbell révèle que les mythes du monde entier partagent une structure commune : le voyage du héros. Suivez cette timeline pour découvrir les 17 étapes du monomythe, illustrées par cinq grandes épopées.</p>
+        </section>
+
+        <!-- PHASE I: DÉPART -->
+        <div class="phase-marker departure" data-phase="departure">
+            <span class="phase-icon">🚪</span>
+            <h2 class="phase-title">Le Départ</h2>
+            <p class="phase-subtitle">La séparation d'avec le monde ordinaire</p>
+        </div>
+
+        <article class="timeline-item departure" data-step="1">
+            <div class="content">
+                <p class="step-number">Étape 1</p>
+                <div class="step-header">
+                    <span class="step-icon">🏠</span>
+                    <h3 class="step-name">Le Monde Ordinaire</h3>
+                </div>
+                <p class="step-description">Le héros vit dans un monde connu, familier, souvent limité. Cette normalité établit le contraste avec l'aventure à venir.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Ulysse règne paisiblement sur Ithaque avec Pénélope et le jeune Télémaque, avant que la guerre de Troie ne l'arrache à son foyer.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Luke Skywalker est un fermier d'humidité sur Tatooine, rêvant d'aventure tout en étant retenu par ses obligations familiales.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Frodon vit une existence tranquille dans la Comté, entouré de collines verdoyantes et de fêtes hobbites.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Thomas Anderson mène une double vie : programmeur le jour dans une entreprise grise, hacker "Neo" la nuit.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Link se réveille sans mémoire dans le Sanctuaire de la Renaissance, seul dans une grotte silencieuse.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Harry vit sous l'escalier chez les Dursley, maltraité et ignorant tout du monde magique et de sa véritable identité.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Simba est un lionceau insouciant dans les Terres du Royaume, fils adoré du roi Mufasa, héritier du trône.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item departure" data-step="2">
+            <div class="content">
+                <p class="step-number">Étape 2</p>
+                <div class="step-header">
+                    <span class="step-icon">📯</span>
+                    <h3 class="step-name">L'Appel de l'Aventure</h3>
+                </div>
+                <p class="step-description">Un événement, un message ou une rencontre vient perturber l'équilibre et invite le héros à quitter son monde.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">La guerre de Troie appelle tous les rois grecs. Ulysse, lié par serment, doit abandonner sa famille pour dix ans de guerre.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">R2-D2 projette le message holographique de la princesse Leia : "Aide-moi, Obi-Wan Kenobi. Vous êtes mon seul espoir."</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Gandalf révèle à Frodon que l'anneau de Bilbon est l'Anneau Unique de Sauron, et qu'il doit quitter la Comté.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">"La Matrice te possède, Neo." Morpheus le contacte et lui propose de découvrir ce qu'est vraiment la Matrice.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">La voix de Zelda résonne dans l'esprit de Link : "Ouvre les yeux... Le destin d'Hyrule repose entre tes mains."</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Les lettres de Poudlard arrivent par centaines, puis Hagrid surgit : "Harry, tu es un sorcier."</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Mufasa montre à Simba l'étendue du royaume depuis le rocher : "Tout ce que la lumière touche sera ton royaume un jour."</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item departure" data-step="3">
+            <div class="content">
+                <p class="step-number">Étape 3</p>
+                <div class="step-header">
+                    <span class="step-icon">🚫</span>
+                    <h3 class="step-name">Le Refus de l'Appel</h3>
+                </div>
+                <p class="step-description">Face à l'inconnu, le héros hésite. La peur, le doute ou les obligations le retiennent dans sa zone de confort.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Ulysse feint la folie, labourant son champ avec du sel, pour échapper à l'appel de la guerre. Palamède déjoue sa ruse.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">"Je ne peux pas partir comme ça. Il y a la récolte..." Luke invoque ses obligations envers son oncle pour refuser.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">"Je voudrais que l'Anneau ne soit jamais venu jusqu'à moi." Frodon espère que quelqu'un d'autre portera ce fardeau.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Au bord de la fenêtre de son bureau, Neo ne peut pas faire le saut de foi. Il se laisse capturer par les agents.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Le joueur peut errer indéfiniment sur le Plateau, cuisinant et chassant, sans jamais affronter son destin.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">L'oncle Vernon tente désespérément d'empêcher Harry de recevoir sa lettre, le refus vient de l'extérieur plutôt que du héros.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Après la mort de Mufasa, Simba fuit et refuse son destin de roi : "Je ne peux pas retourner. Qu'est-ce que ça changerait ?"</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item departure" data-step="4">
+            <div class="content">
+                <p class="step-number">Étape 4</p>
+                <div class="step-header">
+                    <span class="step-icon">🧙</span>
+                    <h3 class="step-name">Le Mentor</h3>
+                </div>
+                <p class="step-description">Une figure sage apparaît pour guider, équiper ou encourager le héros. Elle lui transmet les outils ou la sagesse nécessaires.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Athéna, déesse de la sagesse, veille sur Ulysse tout au long de son périple, prenant diverses formes pour le guider.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Obi-Wan Kenobi remet à Luke le sabre laser de son père et lui révèle l'existence de la Force.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Gandalf guide les premiers pas de Frodon, puis d'autres mentors prennent le relais : Galadriel, Elrond, Aragorn.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Morpheus libère Neo de la Matrice, lui révèle la vérité sur le monde, et l'entraîne au combat dans les simulations.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Le fantôme du roi Rhoam guide Link sur le Plateau. Plus tard, Impa et les esprits des Prodiges l'éclairent.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Hagrid l'introduit au monde magique, puis Dumbledore veille sur lui tout au long de ses années à Poudlard.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Mufasa enseigne à Simba le cycle de la vie. Plus tard, Rafiki le guide vers la vision de son père dans les étoiles.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item departure" data-step="5">
+            <div class="content">
+                <p class="step-number">Étape 5</p>
+                <div class="step-header">
+                    <span class="step-icon">🚪</span>
+                    <h3 class="step-name">Le Passage du Seuil</h3>
+                </div>
+                <p class="step-description">Le héros franchit la frontière entre le monde ordinaire et le monde de l'aventure. Il n'y a pas de retour en arrière.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Au départ de Troie, Ulysse entre dans un monde d'épreuves où les règles ordinaires ne s'appliquent plus.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Luke quitte Tatooine à bord du Faucon Millenium. En hyperespace, son ancienne vie s'éloigne à jamais.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Frodon traverse la frontière de la Comté à Bree : "C'est le pas le plus loin de chez moi que j'aie jamais fait."</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Neo avale la pilule rouge. Son corps se dissout, il se réveille dans sa cuve de culture, nu et vulnérable.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Link obtient la paravoile et s'élance du Plateau du Prélude vers l'immensité d'Hyrule en ruines.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Harry traverse le mur de la voie 9¾ et monte dans le Poudlard Express. Le monde moldu disparaît derrière lui.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Simba traverse le désert après la mort de son père, quittant les Terres du Royaume pour ne jamais revenir... croit-il.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item departure" data-step="6">
+            <div class="content">
+                <p class="step-number">Étape 6</p>
+                <div class="step-header">
+                    <span class="step-icon">🐋</span>
+                    <h3 class="step-name">Le Ventre de la Baleine</h3>
+                </div>
+                <p class="step-description">Une épreuve engloutit le héros dans les ténèbres. C'est la première mort symbolique, la séparation complète avec l'ancien monde.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Ulysse et ses compagnons sont piégés dans la grotte du Cyclope. Pour en sortir, il devra ruser et sacrifier des hommes.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Le Faucon Millenium est capturé par le rayon tracteur de l'Étoile de la Mort. Luke entre dans le ventre de l'ennemi.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Les Hobbits sont piégés par les Cavaliers Noirs, puis s'égarent chez Tom Bombadil et dans les Hauts des Galgals.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Neo se réveille dans sa cuve de culture, corps atrophié, tubes plantés dans la chair. Il voit l'horreur de la réalité.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Link découvre l'ampleur du désastre : Hyrule est en ruines depuis 100 ans, ses alliés sont morts, Zelda lutte seule.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Harry descend dans les souterrains pour affronter le troll, puis plus tard dans la Chambre des Secrets ou le cimetière.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Simba s'effondre dans le désert, mourant de soif et de désespoir. Timon et Pumbaa le trouvent inanimé.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <!-- PHASE II: INITIATION -->
+        <div class="phase-marker initiation" data-phase="initiation">
+            <span class="phase-icon">⚔️</span>
+            <h2 class="phase-title">L'Initiation</h2>
+            <p class="phase-subtitle">Les épreuves qui transforment</p>
+        </div>
+
+        <article class="timeline-item initiation" data-step="7">
+            <div class="content">
+                <p class="step-number">Étape 7</p>
+                <div class="step-header">
+                    <span class="step-icon">🗡️</span>
+                    <h3 class="step-name">Le Chemin des Épreuves</h3>
+                </div>
+                <p class="step-description">Une série d'obstacles, de combats et de tests forge le héros. Chaque épreuve le transforme et lui révèle ses forces.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Le Cyclope, les Lestrygons, Circé, les Sirènes, Charybde et Scylla, les vaches du Soleil... Chaque île est une épreuve.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">L'entraînement au sabre, le sauvetage de Leia, la bataille de Yavin, Dagobah, la grotte obscure, Bespin...</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Les Mines de la Moria, l'Amon Hen, les Marais des Morts, l'antre d'Arachne... Le chemin vers le Mordor est semé d'horreurs.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Les entraînements dans la simulation, les combats contre les agents, l'infiltration du bâtiment gouvernemental...</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Les quatre Créatures Divines, les 120 sanctuaires, les Lynel, les camps de monstres, les épreuves climatiques...</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Les sept années à Poudlard : le Tournoi des Trois Sorciers, les cours d'Occlumencie, la bataille du Ministère, la chasse aux Horcruxes...</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Simba grandit dans la jungle avec Timon et Pumbaa, apprenant "Hakuna Matata" — mais aussi à survivre et à devenir fort.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item initiation" data-step="8">
+            <div class="content">
+                <p class="step-number">Étape 8</p>
+                <div class="step-header">
+                    <span class="step-icon">💕</span>
+                    <h3 class="step-name">La Rencontre avec la Déesse</h3>
+                </div>
+                <p class="step-description">Le héros fait l'expérience de l'amour inconditionnel ou d'une connexion profonde qui lui donne force et sens.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Circé puis Calypso offrent à Ulysse amour et refuge. Mais c'est vers Pénélope, l'amour vrai, qu'il veut retourner.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Leia est à la fois la princesse à sauver et l'alliée égale. Leur lien donnera à Luke la force de continuer.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Galadriel offre sa lumière et sa sagesse. Pour Aragorn, Arwen est l'étoile qui guide ses pas vers son destin.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Trinity aime Neo avant même qu'il ne devienne l'Élu. Son amour le ramènera littéralement d'entre les morts.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Les souvenirs de Zelda reviennent progressivement, révélant leur lien et le sacrifice qu'elle a fait pour lui.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">L'amour de sa mère Lily le protège depuis le début. Ginny devient son ancre, et l'amitié d'Hermione et Ron le soutient.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Nala retrouve Simba dans la jungle. Leur retrouvaille réveille en lui l'amour et le souvenir de qui il est vraiment.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item initiation" data-step="9">
+            <div class="content">
+                <p class="step-number">Étape 9</p>
+                <div class="step-header">
+                    <span class="step-icon">🍎</span>
+                    <h3 class="step-name">La Tentation</h3>
+                </div>
+                <p class="step-description">Le héros est tenté de s'écarter de sa quête par le confort, le pouvoir, l'oubli ou la facilité.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Les Lotophages offrent l'oubli, Circé la régression animale, les Sirènes le savoir mortel, Calypso l'immortalité.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Le côté obscur offre le pouvoir rapide. Vader tente Luke : "Joins-toi à moi, et ensemble nous dominerons la galaxie."</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">L'Anneau murmure constamment à Frodon, lui promettant le pouvoir, tentant tous ceux qui l'approchent.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Cypher trahit l'équipage pour retrouver l'ignorance confortable de la Matrice : "L'ignorance, c'est le bonheur."</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Le joueur peut s'installer dans l'exploration infinie, cuisinant et collectionnant, sans jamais affronter Ganon.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Le Miroir du Riséd montre ses parents ; les Reliques de la Mort promettent le pouvoir sur la mort elle-même.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">"Hakuna Matata" — la philosophie sans souci est une tentation de l'oubli. Simba choisit l'insouciance plutôt que ses responsabilités.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item initiation" data-step="10">
+            <div class="content">
+                <p class="step-number">Étape 10</p>
+                <div class="step-header">
+                    <span class="step-icon">👤</span>
+                    <h3 class="step-name">La Confrontation avec l'Ombre</h3>
+                </div>
+                <p class="step-description">Le héros affronte la figure d'autorité, son double obscur, ou sa propre part d'ombre. Une réconciliation est nécessaire.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Aux Enfers, Ulysse rencontre l'ombre de sa mère, des héros morts, et Tirésias. Il confronte son passé et sa mortalité.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">"Je suis ton père." Luke doit accepter Vader comme son père et reconnaître en lui sa propre capacité au mal.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Au Mont Doom, Frodon cède à l'Anneau : "L'Anneau est à moi !" Il découvre que même lui peut échouer.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">L'agent Smith est le double inversé de Neo. Leur affrontement est une lutte entre deux versions de la réalité.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Link affronte Ganon, incarnation de sa défaite passée. Vaincre le Fléau, c'est dépasser son échec d'il y a 100 ans.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Harry découvre qu'il est lui-même un Horcruxe — une part de Voldemort vit en lui. Il doit accepter de mourir pour vaincre.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Le fantôme de Mufasa apparaît : "Tu es mon fils, et le seul vrai roi. Souviens-toi de qui tu es." Simba affronte sa culpabilité.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item initiation" data-step="11">
+            <div class="content">
+                <p class="step-number">Étape 11</p>
+                <div class="step-header">
+                    <span class="step-icon">✨</span>
+                    <h3 class="step-name">L'Apothéose</h3>
+                </div>
+                <p class="step-description">Un moment de grâce, de révélation ou de transcendance. Le héros accède à une compréhension supérieure.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Ulysse refuse l'immortalité de Calypso. Il choisit de rester mortel, humain, limité — mais libre et lui-même.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Luke jette son sabre : "Je suis un Jedi, comme mon père avant moi." Il refuse le côté obscur et transcende le combat.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">L'Anneau est détruit — non par la volonté de Frodon, mais par un concours de circonstances. La grâce dépasse l'effort.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Neo voit enfin le code de la Matrice. Le monde devient lisible, manipulable. Il est véritablement l'Élu.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Link récupère l'épée de Légende et tous ses souvenirs. Il sait enfin qui il est et ce qu'il doit accomplir.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Dans la gare de King's Cross, Harry dialogue avec Dumbledore entre vie et mort. Il comprend et choisit de revenir.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Simba accepte enfin son identité : "Je suis Simba, fils de Mufasa." Il cesse de fuir et décide de rentrer.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item initiation" data-step="12">
+            <div class="content">
+                <p class="step-number">Étape 12</p>
+                <div class="step-header">
+                    <span class="step-icon">🏆</span>
+                    <h3 class="step-name">Le Don Ultime</h3>
+                </div>
+                <p class="step-description">Le héros obtient ce qu'il cherchait : un objet, un pouvoir, une connaissance, ou une transformation intérieure.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Ulysse gagne la nostos, le retour. Plus qu'un voyage physique, c'est la sagesse qui lui permettra de reconquérir son royaume.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Luke maîtrise la Force et obtient la rédemption de son père. Vader meurt en Anakin Skywalker, réconcilié.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Sauron est vaincu, la Terre du Milieu libérée. Mais le don est amer : Frodon est blessé à jamais par sa quête.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Neo peut manipuler la Matrice à volonté. Il détient le pouvoir de libérer l'humanité de son sommeil.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Link possède la puissance nécessaire pour affronter le Fléau : l'épée, les pouvoirs des Prodiges, ses souvenirs.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Harry possède les trois Reliques de la Mort et maîtrise la baguette de Sureau. Mais son vrai don est l'acceptation de la mort.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Simba a retrouvé son courage et son identité. Il est prêt à reprendre sa place légitime de roi.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <!-- PHASE III: RETOUR -->
+        <div class="phase-marker return" data-phase="return">
+            <span class="phase-icon">🏠</span>
+            <h2 class="phase-title">Le Retour</h2>
+            <p class="phase-subtitle">La réintégration du monde ordinaire</p>
+        </div>
+
+        <article class="timeline-item return" data-step="13">
+            <div class="content">
+                <p class="step-number">Étape 13</p>
+                <div class="step-header">
+                    <span class="step-icon">🌅</span>
+                    <h3 class="step-name">Le Refus du Retour</h3>
+                </div>
+                <p class="step-description">Après les merveilles du monde extraordinaire, le héros peut hésiter à revenir à la vie ordinaire.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Ulysse reste sept ans chez Calypso. Est-ce captivité ou tentation de l'oubli ? Le retour exige un arrachement.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Luke refuse de fuir sans son père. Il reste sur l'Étoile de la Mort pour sauver Vader de l'Empereur.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Frodon, blessé par l'Anneau, ne peut plus vivre normalement. La Comté lui est devenue étrangère.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Neo choisit de rester dans la Matrice pour continuer le combat. Le monde réel peut attendre.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Le joueur peut indéfiniment repousser le combat final, profitant de la liberté d'exploration.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Dans les limbes de King's Cross, Harry pourrait "prendre un train" et partir. Dumbledore lui laisse le choix.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Simba hésite encore : "Je ne peux pas affronter Scar, tout le monde croira que j'ai tué mon père."</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item return" data-step="14">
+            <div class="content">
+                <p class="step-number">Étape 14</p>
+                <div class="step-header">
+                    <span class="step-icon">🌊</span>
+                    <h3 class="step-name">Le Passage du Retour</h3>
+                </div>
+                <p class="step-description">Le chemin du retour peut être aussi périlleux que l'aller. Le héros doit franchir à nouveau le seuil.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Ulysse arrive à Ithaque déguisé en mendiant. Il doit traverser son propre palais en étranger avant de se révéler.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Luke s'échappe de l'Étoile de la Mort en flammes, portant le corps de son père racheté.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Les Hobbits reviennent dans une Comté occupée par Saroumane. Un dernier combat les attend chez eux.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Neo est tué par Smith, mais l'amour de Trinity le ramène. Il ressuscite, transformé.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Link entre dans le château d'Hyrule, traversant les ruines de ce qui fut sa maison.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Harry revient à la vie et feint la mort pendant que Hagrid le porte. Il attend le moment de se révéler.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Simba traverse les Terres du Royaume dévastées par Scar. Ce qui était luxuriant est devenu désert et mort.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item return" data-step="15">
+            <div class="content">
+                <p class="step-number">Étape 15</p>
+                <div class="step-header">
+                    <span class="step-icon">🔥</span>
+                    <h3 class="step-name">L'Épreuve Finale</h3>
+                </div>
+                <p class="step-description">Un dernier combat ou une ultime épreuve cristallise tout ce que le héros a appris.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Ulysse bande son arc et massacre les prétendants qui ont envahi sa maison et convoité sa femme.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">L'Empereur tente de détruire Luke. Vader, touché par l'amour de son fils, se retourne et tue son maître.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Le nettoyage de la Comté : les Hobbits, transformés par leurs épreuves, libèrent leur pays par eux-mêmes.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Neo affronte Smith une dernière fois. Voyant le code, il entre dans l'agent et le fait exploser de l'intérieur.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Combat contre Ganon dans le château, puis contre le Fléau dans la plaine d'Hyrule. Zelda achève le monstre.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Harry affronte Voldemort dans la Grande Salle. Les baguettes se croisent, et le sortilège de mort se retourne contre son lanceur.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Simba affronte Scar au sommet du Rocher du Lion. La vérité éclate, et Scar est vaincu par ses propres alliées, les hyènes.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item return" data-step="16">
+            <div class="content">
+                <p class="step-number">Étape 16</p>
+                <div class="step-header">
+                    <span class="step-icon">⚖️</span>
+                    <h3 class="step-name">Maître des Deux Mondes</h3>
+                </div>
+                <p class="step-description">Le héros peut désormais circuler entre le monde ordinaire et extraordinaire, intégrant les deux.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Ulysse est à nouveau roi, époux et père. Ses épreuves lui ont donné la sagesse de gouverner.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">Luke est un Jedi accompli, héritier de son père racheté, pont entre l'ancienne et la nouvelle génération.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">Frodon a accès aux Havres Gris, royaume des Elfes. Aragorn règne, Sam devient maire.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Neo peut entrer et sortir de la Matrice à volonté, manipulant ses règles. Il est libre des deux côtés.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Link a vaincu le mal. Il peut parcourir Hyrule en héros reconnu, mémoire et pouvoir restaurés.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">Harry possède les Reliques mais choisit de ne garder que la Cape. Il peut vivre dans le monde sorcier et le monde moldu.</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">Simba est roi, mais il porte en lui la sagesse de son père et les leçons de son exil. Il unit les deux parts de sa vie.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <article class="timeline-item return" data-step="17">
+            <div class="content">
+                <p class="step-number">Étape 17</p>
+                <div class="step-header">
+                    <span class="step-icon">🕊️</span>
+                    <h3 class="step-name">La Liberté de Vivre</h3>
+                </div>
+                <p class="step-description">La quête accomplie, le héros et sa communauté peuvent vivre pleinement, libérés de la menace.</p>
+                <p class="click-hint">👆 Cliquez pour voir les exemples</p>
+                <div class="epic-examples">
+                    <div class="epic-example odyssey"><span class="icon">🏛️</span><div><p class="title">L'Odyssée</p><p class="text">Athéna scelle la paix entre Ulysse et les familles des prétendants. Ithaque peut renaître.</p></div></div>
+                    <div class="epic-example starwars"><span class="icon">⚔️</span><div><p class="title">Star Wars</p><p class="text">L'Empire est vaincu, la galaxie libérée. Les fantômes d'Obi-Wan, Yoda et Anakin sourient à Luke.</p></div></div>
+                    <div class="epic-example lotr"><span class="icon">💍</span><div><p class="title">Le Seigneur des Anneaux</p><p class="text">La Comté est en paix. Sam plante le mallorne de Galadriel. Frodon part vers l'Ouest pour guérir enfin.</p></div></div>
+                    <div class="epic-example matrix"><span class="icon">💊</span><div><p class="title">Matrix</p><p class="text">Neo promet de montrer aux humains un monde sans règles, sans contrôle. La libération est possible.</p></div></div>
+                    <div class="epic-example zelda"><span class="icon">🗡️</span><div><p class="title">Zelda: Breath of the Wild</p><p class="text">Zelda est libérée. Hyrule peut être reconstruit. Link et Zelda contemplent ensemble un nouveau départ.</p></div></div>
+                    <div class="epic-example harrypotter"><span class="icon">⚡</span><div><p class="title">Harry Potter</p><p class="text">19 ans plus tard : Harry envoie ses propres enfants à Poudlard. Le monde magique vit en paix. "Tout était bien."</p></div></div>
+                    <div class="epic-example lionking"><span class="icon">🦁</span><div><p class="title">Le Roi Lion</p><p class="text">La pluie revient, la savane renaît. Simba et Nala présentent leur lionceau au royaume. Le cercle de la vie continue.</p></div></div>
+                </div>
+            </div>
+            <div class="timeline-node"></div>
+        </article>
+
+        <section class="end-section">
+            <div class="end-icon">🌟</div>
+            <p class="end-quote">« Nous devons être prêts à nous défaire de la vie que nous avons planifiée, afin d'avoir la vie qui nous attend. »</p>
+            <p class="end-author">— Joseph Campbell</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Une exploration du monomythe de Joseph Campbell</p>
+        <p><em>Le Héros aux mille et un visages</em> (1949)</p>
+    </footer>
+
+    <div class="nav-hint">Défilez ↓</div>
+
+    <script>
+        // Epic filtering
+        const epicButtons = document.querySelectorAll('.epic-btn');
+        const allExamples = document.querySelectorAll('.epic-example');
+
+        epicButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                epicButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const selectedEpic = btn.dataset.epic;
+
+                allExamples.forEach(example => {
+                    if (selectedEpic === 'all') {
+                        example.style.display = 'flex';
+                    } else {
+                        example.style.display = example.classList.contains(selectedEpic) ? 'flex' : 'none';
+                    }
+                });
+            });
+        });
+
+        // Card expansion
+        const timelineContents = document.querySelectorAll('.timeline-item .content');
+
+        timelineContents.forEach(content => {
+            content.addEventListener('click', () => {
+                const examples = content.querySelector('.epic-examples');
+                const isVisible = examples.classList.contains('visible');
+
+                // Close all
+                timelineContents.forEach(c => {
+                    c.querySelector('.epic-examples').classList.remove('visible');
+                    c.classList.remove('expanded');
+                });
+
+                // Toggle current
+                if (!isVisible) {
+                    examples.classList.add('visible');
+                    content.classList.add('expanded');
+                    
+                    setTimeout(() => {
+                        content.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                }
+            });
+        });
+
+        // Scroll progress
+        const progressFill = document.querySelector('.progress-fill');
+        const progressLabels = document.querySelectorAll('.progress-label');
+        const phaseMarkers = document.querySelectorAll('.phase-marker');
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        const navHint = document.querySelector('.nav-hint');
+
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            
+            progressFill.style.width = `${progress}%`;
+
+            // Update active phase label
+            let currentPhase = 'departure';
+            phaseMarkers.forEach(marker => {
+                const rect = marker.getBoundingClientRect();
+                if (rect.top < window.innerHeight / 2) {
+                    currentPhase = marker.dataset.phase;
+                }
+            });
+
+            progressLabels.forEach(label => {
+                label.classList.toggle('active', label.dataset.phase === currentPhase);
+            });
+
+            // Hide nav hint on scroll
+            navHint.style.opacity = scrollTop > 200 ? '0' : '0.5';
+        }
+
+        window.addEventListener('scroll', updateProgress);
+
+        // Intersection observer for animations
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        timelineItems.forEach(item => {
+            observer.observe(item);
+        });
+
+        // Initial state
+        updateProgress();
+    </script>
+</body>
+</html>
