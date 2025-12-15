@@ -395,7 +395,7 @@
         /* Phase markers */
         .phase-marker {
             flex-shrink: 0;
-            width: 140px;
+            width: 160px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -406,31 +406,10 @@
             padding: 0 1rem;
         }
 
-        .phase-marker::before {
-            content: '';
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 3px solid;
-            background: var(--ink);
-        }
-
-        .phase-marker.departure::before { border-color: var(--phase-departure); }
-        .phase-marker.initiation::before { border-color: var(--phase-initiation); }
-        .phase-marker.return::before { border-color: var(--phase-return); }
-
         .phase-marker .phase-icon {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            z-index: 3;
+            font-size: 5rem;
+            line-height: 1;
+            margin-bottom: 0.5rem;
         }
 
         .phase-marker .phase-title {
@@ -438,7 +417,6 @@
             font-size: 0.9rem;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            margin-top: 0.8rem;
             margin-bottom: 0.3rem;
         }
 
@@ -450,7 +428,7 @@
             font-style: italic;
             color: var(--text-secondary);
             font-size: 0.8rem;
-            max-width: 120px;
+            max-width: 140px;
         }
 
         /* Timeline items */
@@ -948,18 +926,11 @@
             }
 
             .phase-marker {
-                width: 100px;
-            }
-
-            .phase-marker::before {
-                width: 55px;
-                height: 55px;
+                width: 110px;
             }
 
             .phase-marker .phase-icon {
-                width: 55px;
-                height: 55px;
-                font-size: 1.5rem;
+                font-size: 3.5rem;
             }
 
             .modal-content {
