@@ -6,7 +6,7 @@
     <title>Le Voyage du Héros — Timeline du Monomythe</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     <style>
-        :root {
+        :root, [data-theme="default"] {
             --gold: #e8b86d;
             --gold-light: #f5d599;
             --gold-dark: #c9923e;
@@ -17,13 +17,146 @@
             --parchment-dark: #e8e0d4;
             --text-primary: #f5f2ed;
             --text-secondary: #c9c4bc;
-
             --phase-departure: #5a8fd4;
             --phase-departure-light: #7ba8e6;
             --phase-initiation: #c45a7a;
             --phase-initiation-light: #d87a96;
             --phase-return: #6ba35a;
             --phase-return-light: #8bc47a;
+            --theme-accent: var(--gold);
+        }
+
+        /* Odyssée - Méditerranée antique */
+        [data-theme="odyssey"] {
+            --gold: #4a9ec7;
+            --gold-light: #7bbde0;
+            --gold-dark: #2d7ba3;
+            --ink: #0a1520;
+            --ink-light: #132535;
+            --ink-medium: #1c3548;
+            --text-primary: #e8f4f8;
+            --text-secondary: #a8c8d8;
+            --phase-departure: #4a9ec7;
+            --phase-departure-light: #6db8d9;
+            --phase-initiation: #c4785a;
+            --phase-initiation-light: #d89676;
+            --phase-return: #5a8b6b;
+            --phase-return-light: #7aab8b;
+            --theme-accent: #4a9ec7;
+        }
+
+        /* Star Wars - Espace galactique */
+        [data-theme="starwars"] {
+            --gold: #ffe81f;
+            --gold-light: #fff176;
+            --gold-dark: #c9b800;
+            --ink: #000000;
+            --ink-light: #0d0d0d;
+            --ink-medium: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --phase-departure: #4a90d9;
+            --phase-departure-light: #6aa8e9;
+            --phase-initiation: #d93636;
+            --phase-initiation-light: #e95555;
+            --phase-return: #36d936;
+            --phase-return-light: #55e955;
+            --theme-accent: #ffe81f;
+        }
+
+        /* Seigneur des Anneaux - Terre du Milieu */
+        [data-theme="lotr"] {
+            --gold: #8b7355;
+            --gold-light: #a89070;
+            --gold-dark: #6b5540;
+            --ink: #1a1510;
+            --ink-light: #2a2318;
+            --ink-medium: #3a3020;
+            --text-primary: #f0e8d8;
+            --text-secondary: #c0b8a0;
+            --phase-departure: #5a7a5a;
+            --phase-departure-light: #7a9a7a;
+            --phase-initiation: #8b5a5a;
+            --phase-initiation-light: #ab7a7a;
+            --phase-return: #7a8b5a;
+            --phase-return-light: #9aab7a;
+            --theme-accent: #8b7355;
+        }
+
+        /* Matrix - Cyberpunk */
+        [data-theme="matrix"] {
+            --gold: #00ff41;
+            --gold-light: #50ff80;
+            --gold-dark: #00c932;
+            --ink: #000000;
+            --ink-light: #001a00;
+            --ink-medium: #002200;
+            --text-primary: #00ff41;
+            --text-secondary: #008f24;
+            --phase-departure: #00ff41;
+            --phase-departure-light: #50ff80;
+            --phase-initiation: #ff0041;
+            --phase-initiation-light: #ff5080;
+            --phase-return: #00c8ff;
+            --phase-return-light: #50d8ff;
+            --theme-accent: #00ff41;
+        }
+
+        /* Zelda - Hyrule */
+        [data-theme="zelda"] {
+            --gold: #7cba3d;
+            --gold-light: #9ed45a;
+            --gold-dark: #5c9a20;
+            --ink: #1a2010;
+            --ink-light: #283018;
+            --ink-medium: #384020;
+            --text-primary: #f0f8e8;
+            --text-secondary: #b8d0a0;
+            --phase-departure: #5aa0d4;
+            --phase-departure-light: #7ab8e4;
+            --phase-initiation: #d45a7a;
+            --phase-initiation-light: #e47a9a;
+            --phase-return: #7cba3d;
+            --phase-return-light: #9cd45d;
+            --theme-accent: #7cba3d;
+        }
+
+        /* Harry Potter - Poudlard */
+        [data-theme="harrypotter"] {
+            --gold: #d4a04a;
+            --gold-light: #e8c070;
+            --gold-dark: #a07830;
+            --ink: #1a1015;
+            --ink-light: #2a1820;
+            --ink-medium: #3a2028;
+            --text-primary: #f8f0e8;
+            --text-secondary: #c8b8a8;
+            --phase-departure: #5a6a8b;
+            --phase-departure-light: #7a8aab;
+            --phase-initiation: #8b3545;
+            --phase-initiation-light: #ab5565;
+            --phase-return: #6a8b5a;
+            --phase-return-light: #8aab7a;
+            --theme-accent: #d4a04a;
+        }
+
+        /* Le Roi Lion - Savane */
+        [data-theme="lionking"] {
+            --gold: #e67e22;
+            --gold-light: #f0a050;
+            --gold-dark: #c06010;
+            --ink: #1a1008;
+            --ink-light: #2a1810;
+            --ink-medium: #3a2818;
+            --text-primary: #fff8e8;
+            --text-secondary: #d8c0a0;
+            --phase-departure: #e67e22;
+            --phase-departure-light: #f09840;
+            --phase-initiation: #c0392b;
+            --phase-initiation-light: #e05545;
+            --phase-return: #8b6914;
+            --phase-return-light: #ab8934;
+            --theme-accent: #e67e22;
         }
 
         * {
@@ -645,6 +778,93 @@
             50% { opacity: 1; }
         }
 
+        /* Theme switcher */
+        .theme-switcher {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 200;
+        }
+
+        .theme-toggle {
+            background: var(--ink-medium);
+            border: 1px solid var(--gold-dark);
+            color: var(--gold);
+            padding: 0.5rem 0.8rem;
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--gold);
+            color: var(--ink);
+        }
+
+        .theme-toggle .icon {
+            font-size: 1rem;
+        }
+
+        .theme-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: var(--ink-medium);
+            border: 1px solid var(--gold-dark);
+            border-radius: 6px;
+            padding: 0.5rem;
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .theme-switcher.open .theme-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 0.8rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: 'Crimson Pro', serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .theme-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .theme-option.active {
+            background: var(--gold);
+            color: var(--ink);
+        }
+
+        .theme-option .emoji {
+            font-size: 1.1rem;
+            width: 1.4rem;
+            text-align: center;
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -741,6 +961,48 @@
     </style>
 </head>
 <body>
+    <!-- Theme Switcher -->
+    <div class="theme-switcher" id="themeSwitcher">
+        <button class="theme-toggle" id="themeToggle">
+            <span class="icon">🎨</span>
+            <span>Thème</span>
+        </button>
+        <div class="theme-menu">
+            <button class="theme-option active" data-theme="default">
+                <span class="emoji">📜</span>
+                <span>Classique</span>
+            </button>
+            <button class="theme-option" data-theme="odyssey">
+                <span class="emoji">🏛️</span>
+                <span>Odyssée</span>
+            </button>
+            <button class="theme-option" data-theme="starwars">
+                <span class="emoji">⚔️</span>
+                <span>Star Wars</span>
+            </button>
+            <button class="theme-option" data-theme="lotr">
+                <span class="emoji">💍</span>
+                <span>Terre du Milieu</span>
+            </button>
+            <button class="theme-option" data-theme="matrix">
+                <span class="emoji">💊</span>
+                <span>Matrix</span>
+            </button>
+            <button class="theme-option" data-theme="zelda">
+                <span class="emoji">🗡️</span>
+                <span>Hyrule</span>
+            </button>
+            <button class="theme-option" data-theme="harrypotter">
+                <span class="emoji">⚡</span>
+                <span>Poudlard</span>
+            </button>
+            <button class="theme-option" data-theme="lionking">
+                <span class="emoji">🦁</span>
+                <span>Savane</span>
+            </button>
+        </div>
+    </div>
+
     <header>
         <h1>Le Voyage du Héros</h1>
         <p class="subtitle">Timeline du Monomythe</p>
@@ -1205,6 +1467,49 @@
     </div>
 
     <script>
+        // Theme Switcher
+        const themeSwitcher = document.getElementById('themeSwitcher');
+        const themeToggle = document.getElementById('themeToggle');
+        const themeOptions = document.querySelectorAll('.theme-option');
+
+        // Load saved theme or default
+        const savedTheme = localStorage.getItem('heroJourneyTheme') || 'default';
+        document.body.setAttribute('data-theme', savedTheme);
+        document.querySelector(`.theme-option[data-theme="${savedTheme}"]`)?.classList.add('active');
+
+        // Toggle menu
+        themeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            themeSwitcher.classList.toggle('open');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!themeSwitcher.contains(e.target)) {
+                themeSwitcher.classList.remove('open');
+            }
+        });
+
+        // Theme selection
+        themeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const theme = option.dataset.theme;
+
+                // Update body theme
+                document.body.setAttribute('data-theme', theme);
+
+                // Update active state
+                themeOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+
+                // Save preference
+                localStorage.setItem('heroJourneyTheme', theme);
+
+                // Close menu
+                themeSwitcher.classList.remove('open');
+            });
+        });
+
         // Data for the steps
         const stepsData = {};
 
