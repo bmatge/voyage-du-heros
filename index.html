@@ -1230,7 +1230,22 @@
         const modalClose = document.getElementById('modalClose');
 
         let currentActiveItem = null;
-        let selectedEpic = 'all';
+        const allEpics = ['odyssey', 'starwars', 'lotr', 'matrix', 'zelda', 'harrypotter', 'lionking'];
+        let selectedEpics = new Set(allEpics); // Start with all selected
+
+        function updateButtonStates() {
+            const epicButtons = document.querySelectorAll('.epic-btn');
+            const allSelected = selectedEpics.size === allEpics.length;
+
+            epicButtons.forEach(btn => {
+                const epic = btn.dataset.epic;
+                if (epic === 'all') {
+                    btn.classList.toggle('active', allSelected);
+                } else {
+                    btn.classList.toggle('active', selectedEpics.has(epic));
+                }
+            });
+        }
 
         function openModal(stepNumber) {
             const data = stepsData[stepNumber];
@@ -1271,11 +1286,11 @@
         function applyEpicFilter() {
             const examples = modalExamples.querySelectorAll('.epic-example');
             examples.forEach(example => {
-                if (selectedEpic === 'all') {
-                    example.style.display = 'flex';
-                } else {
-                    example.style.display = example.classList.contains(selectedEpic) ? 'flex' : 'none';
-                }
+                // Check if the example matches any selected epic
+                const isVisible = allEpics.some(epic =>
+                    selectedEpics.has(epic) && example.classList.contains(epic)
+                );
+                example.style.display = isVisible ? 'flex' : 'none';
             });
         }
 
@@ -1292,13 +1307,29 @@
             });
         });
 
-        // Epic filtering
+        // Epic filtering with multi-select
         const epicButtons = document.querySelectorAll('.epic-btn');
         epicButtons.forEach(btn => {
             btn.addEventListener('click', () => {
-                epicButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selectedEpic = btn.dataset.epic;
+                const epic = btn.dataset.epic;
+
+                if (epic === 'all') {
+                    // "Toutes" button: if all selected, deselect all; otherwise select all
+                    if (selectedEpics.size === allEpics.length) {
+                        selectedEpics.clear();
+                    } else {
+                        selectedEpics = new Set(allEpics);
+                    }
+                } else {
+                    // Toggle individual epic
+                    if (selectedEpics.has(epic)) {
+                        selectedEpics.delete(epic);
+                    } else {
+                        selectedEpics.add(epic);
+                    }
+                }
+
+                updateButtonStates();
 
                 // Update modal if open
                 if (modal.classList.contains('visible')) {
@@ -1306,6 +1337,9 @@
                 }
             });
         });
+
+        // Initialize button states
+        updateButtonStates();
 
         // Timeline navigation
         const timeline = document.getElementById('timeline');
