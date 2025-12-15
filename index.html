@@ -123,28 +123,12 @@
         /* Intro section */
         .intro-section {
             text-align: center;
-            padding: 2rem 2rem 1rem;
+            padding: 1.5rem 2rem 1rem;
             max-width: 800px;
             margin: 0 auto;
         }
 
-        .intro-quote {
-            font-size: 1.25rem;
-            font-style: italic;
-            color: var(--text-primary);
-            line-height: 1.8;
-            margin-bottom: 0.8rem;
-        }
-
-        .intro-author {
-            font-family: 'Cinzel', serif;
-            font-size: 0.9rem;
-            color: var(--gold);
-            letter-spacing: 0.1em;
-        }
-
         .intro-text {
-            margin-top: 1.2rem;
             font-size: 1rem;
             line-height: 1.8;
             color: var(--text-secondary);
@@ -523,6 +507,44 @@
             margin-bottom: 1rem;
         }
 
+        .modal-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem 1.5rem;
+            border-top: 1px solid rgba(232, 184, 109, 0.15);
+            gap: 1rem;
+        }
+
+        .modal-nav-btn {
+            flex: 1;
+            max-width: 200px;
+            padding: 0.8rem 1.2rem;
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            background: rgba(232, 184, 109, 0.1);
+            border: 1px solid rgba(232, 184, 109, 0.3);
+            color: var(--gold);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .modal-nav-btn:hover,
+        .modal-nav-btn:focus {
+            background: rgba(232, 184, 109, 0.2);
+            border-color: var(--gold);
+            outline: none;
+        }
+
+        .modal-nav-btn:focus {
+            box-shadow: 0 0 0 2px var(--gold);
+        }
+
+        .modal-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
         /* Epic examples in modal */
         .epic-examples-grid {
             display: grid;
@@ -760,9 +782,7 @@
     </header>
 
     <section class="intro-section">
-        <p class="intro-quote">« Le héros aux mille et un visages n'est qu'un seul héros : c'est nous-mêmes, en quête de transformation. »</p>
-        <p class="intro-author">— Joseph Campbell</p>
-        <p class="intro-text">En 1949, Joseph Campbell révèle que les mythes du monde entier partagent une structure commune : le voyage du héros. Suivez cette timeline pour découvrir les 17 étapes du monomythe, illustrées par sept grandes épopées.</p>
+        <p class="intro-text">En 1949, Joseph Campbell révèle que les mythes du monde entier partagent une structure commune : le voyage du héros. Sélectionnez une ou plusieurs œuvres et suivez l'évolution pour découvrir les 17 étapes de ces quêtes héroïques.</p>
     </section>
 
     <div class="legend">
@@ -1177,6 +1197,10 @@
                 <p class="modal-examples-title">Exemples dans les grandes épopées</p>
                 <div class="epic-examples-grid" id="modalExamples"></div>
             </div>
+            <div class="modal-nav">
+                <button class="modal-nav-btn" id="modalPrev">← Précédent</button>
+                <button class="modal-nav-btn" id="modalNext">Suivant →</button>
+            </div>
         </div>
     </div>
 
@@ -1207,8 +1231,12 @@
         const modalDescription = document.getElementById('modalDescription');
         const modalExamples = document.getElementById('modalExamples');
         const modalClose = document.getElementById('modalClose');
+        const modalPrev = document.getElementById('modalPrev');
+        const modalNext = document.getElementById('modalNext');
 
         let currentActiveItem = null;
+        let currentStepNumber = 1;
+        const totalSteps = 17;
         const allEpics = ['odyssey', 'starwars', 'lotr', 'matrix', 'zelda', 'harrypotter', 'lionking'];
         let selectedEpics = new Set(allEpics); // Start with all selected
 
@@ -1226,9 +1254,11 @@
             });
         }
 
-        function openModal(stepNumber) {
+        function openModal(stepNumber, focusNext = true) {
             const data = stepsData[stepNumber];
             if (!data) return;
+
+            currentStepNumber = parseInt(stepNumber);
 
             modalIcon.textContent = data.icon;
             modalTitle.textContent = data.name;
@@ -1238,6 +1268,10 @@
 
             // Apply current epic filter
             applyEpicFilter();
+
+            // Update nav buttons state
+            modalPrev.disabled = currentStepNumber <= 1;
+            modalNext.disabled = currentStepNumber >= totalSteps;
 
             modal.classList.add('visible');
             document.body.style.overflow = 'hidden';
@@ -1250,6 +1284,15 @@
             if (currentActiveItem) {
                 currentActiveItem.classList.add('active');
             }
+
+            // Focus on appropriate nav button
+            setTimeout(() => {
+                if (focusNext && !modalNext.disabled) {
+                    modalNext.focus();
+                } else if (!modalPrev.disabled) {
+                    modalPrev.focus();
+                }
+            }, 100);
         }
 
         function closeModal() {
@@ -1277,6 +1320,27 @@
         modalClose.addEventListener('click', closeModal);
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
+        });
+
+        // Modal navigation
+        modalPrev.addEventListener('click', () => {
+            if (currentStepNumber > 1) {
+                openModal(currentStepNumber - 1, false);
+                // Scroll timeline to keep current step visible
+                if (currentActiveItem) {
+                    currentActiveItem.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+            }
+        });
+
+        modalNext.addEventListener('click', () => {
+            if (currentStepNumber < totalSteps) {
+                openModal(currentStepNumber + 1, true);
+                // Scroll timeline to keep current step visible
+                if (currentActiveItem) {
+                    currentActiveItem.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+            }
         });
 
         // Timeline item clicks and keyboard navigation
@@ -1352,6 +1416,16 @@
             if (modal.classList.contains('visible')) {
                 if (e.key === 'Escape') {
                     closeModal();
+                } else if (e.key === 'ArrowLeft' && currentStepNumber > 1) {
+                    openModal(currentStepNumber - 1, false);
+                    if (currentActiveItem) {
+                        currentActiveItem.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    }
+                } else if (e.key === 'ArrowRight' && currentStepNumber < totalSteps) {
+                    openModal(currentStepNumber + 1, true);
+                    if (currentActiveItem) {
+                        currentActiveItem.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    }
                 }
             } else {
                 if (e.key === 'ArrowLeft') {
@@ -1359,12 +1433,6 @@
                 } else if (e.key === 'ArrowRight') {
                     timeline.scrollBy({ left: scrollAmount, behavior: 'smooth' });
                 }
-            }
-
-            // Navigate between steps with Enter
-            if (e.key === 'Enter' && currentActiveItem) {
-                const currentStep = parseInt(currentActiveItem.dataset.step);
-                // Already open, do nothing
             }
         });
 
