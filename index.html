@@ -301,11 +301,19 @@
             transition: transform 0.3s ease;
         }
 
-        .timeline-item:hover {
+        .timeline-item:hover,
+        .timeline-item:focus {
             transform: translateY(-5px);
+            outline: none;
         }
 
-        .timeline-item:hover .timeline-node {
+        .timeline-item:focus .content {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px var(--gold), 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .timeline-item:hover .timeline-node,
+        .timeline-item:focus .timeline-node {
             transform: scale(1.3);
             box-shadow: 0 0 20px currentColor;
         }
@@ -615,45 +623,23 @@
             50% { opacity: 1; }
         }
 
-        /* End section */
-        .end-section {
-            text-align: center;
-            padding: 3rem 2rem;
-            border-top: 1px solid rgba(232, 184, 109, 0.1);
-        }
-
-        .end-section .end-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .end-section .end-quote {
-            font-size: 1.15rem;
-            font-style: italic;
-            color: var(--text-primary);
-            max-width: 600px;
-            margin: 0 auto 1rem;
-            line-height: 1.8;
-        }
-
-        .end-section .end-author {
-            font-family: 'Cinzel', serif;
-            font-size: 0.9rem;
-            color: var(--gold);
-            letter-spacing: 0.1em;
-        }
-
         /* Footer */
         footer {
             text-align: center;
-            padding: 2rem;
-            border-top: 1px solid rgba(232, 184, 109, 0.1);
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            padding: 1rem;
+            font-size: 0.8rem;
         }
 
-        footer em {
-            color: var(--gold-dark);
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        footer a:hover {
+            opacity: 1;
+            color: var(--gold);
         }
 
         /* Mobile responsive */
@@ -1169,15 +1155,8 @@
 
     <p class="keyboard-hint">Navigation : <kbd>←</kbd> <kbd>→</kbd> pour défiler, <kbd>Entrée</kbd> ou clic pour voir les détails, <kbd>Échap</kbd> pour fermer</p>
 
-    <section class="end-section">
-        <div class="end-icon">🌟</div>
-        <p class="end-quote">« Nous devons être prêts à nous défaire de la vie que nous avons planifiée, afin d'avoir la vie qui nous attend. »</p>
-        <p class="end-author">— Joseph Campbell</p>
-    </section>
-
     <footer>
-        <p>Une exploration du monomythe de Joseph Campbell</p>
-        <p><em>Le Héros aux mille et un visages</em> (1949)</p>
+        <a href="https://github.com/bmatge/voyage-du-heros" target="_blank" rel="noopener">CC BY-SA</a>
     </footer>
 
     <!-- Modal for examples -->
@@ -1300,10 +1279,23 @@
             if (e.target === modal) closeModal();
         });
 
-        // Timeline item clicks
+        // Timeline item clicks and keyboard navigation
         document.querySelectorAll('.timeline-item').forEach(item => {
+            // Make focusable
+            item.setAttribute('tabindex', '0');
+            item.setAttribute('role', 'button');
+            item.setAttribute('aria-label', `${item.querySelector('.step-name').textContent} - Cliquez pour voir les exemples`);
+
             item.addEventListener('click', () => {
                 openModal(item.dataset.step);
+            });
+
+            // Open modal on Enter key when focused
+            item.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openModal(item.dataset.step);
+                }
             });
         });
 
@@ -1384,6 +1376,18 @@
 
         timeline.addEventListener('scroll', updateNavButtons);
         updateNavButtons();
+
+        // Horizontal scroll with mouse wheel on timeline
+        timeline.addEventListener('wheel', (e) => {
+            // Only capture vertical scroll and convert to horizontal
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                timeline.scrollBy({
+                    left: e.deltaY,
+                    behavior: 'auto'
+                });
+            }
+        }, { passive: false });
 
         // Smooth scroll on page load
         window.addEventListener('load', () => {
